@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Node.js Playstation 3 / DS3 Controller for CNC.js
 // by Austin St. Aubin <austinsaintaubin@gmail.com>
 // v0.8 BETA [2016/12/24]
@@ -5,19 +7,49 @@
 // [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 
 // [Dependacies]
-var io = require('socket.io-client');  // Socket.io connection to CNC
-var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var path = require('path');
-var dualShock = require('dualshock-controller');  // ttps://www.npmjs.com/package/dualshock-controller
+var io = require('socket.io-client');  // Socket.io connection to CNC
+var jwt = require('jsonwebtoken');
+var program = require('commander');
+var serialport = require('serialport');
+var dualShock = require('dualshock-controller'); // https://www.npmjs.com/package/dualshock-controller
+var pkg = require('../package.json');
 
+program
+	.version(pkg.version)
+	.usage('-p <port> [options]')
+	.option('-l, --list', 'list available ports then exit')
+	.option('-p, --port <port>', 'path or name of serial port (default: /dev/ttyUSB0)', '/dev/ttyUSB0')
+	.option('-b, --baudrate <baudrate>', 'baud rate (default: 115200)', 115200)
+	.option('--socket-address <address>', 'socket address or hostname (default: localhost)', 'localhost')
+	.option('--socket-port <port>', 'socket port (default: 8000)', 8000)
+	.option('--controller-type <type>', 'controller type: Grbl|Smoothie|TinyG (default: Grbl)', 'Grbl');
+
+if (process.argv.length > 1) {
+	program.parse(process.argv);
+}
+
+if (program.list) {
+	serialport.list(function(err, ports) {
+		if (err) {
+			console.error(err);
+			process.exit(1);
+		}
+		ports.forEach(function(port) {
+			console.log(port.comName);
+		});
+	});
+	return;
+}
 
 // [Varables]
-var controller_serial_port = '/dev/ttyUSB0'
-var controller_serial_baud = 115200
+var controller_serial_port = program.port;
+var controller_serial_baud = program.baudrate;
+var controller_type = program.controllerType;
 
-var socket_address = 'localhost'
-	socket_port = '8000'
+var socket_address = program.socketAddress;
+	socket_port = program.socketPort;
 	socket_token_expiration = '30d' // The access token lifetime is a required field for jsonwebtoken, it can be expressed in seconds (e.g. 60) or a time span string like '7 days', '3d', '1h'.
 
 var socket, controller;
@@ -85,11 +117,11 @@ function run(socket, controller)
 	// [Function] Generate Access Token
 	// https://github.com/auth0/node-jsonwebtoken#jwtsignpayload-secretorprivatekey-options-callback
 	var generateAccessToken = function(payload, secret, expiration) {
-	    var token = jwt.sign(payload, secret, {
-	        expiresIn: expiration //'30d' // 30 days
-	    });
+		var token = jwt.sign(payload, secret, {
+			expiresIn: expiration //'30d' // 30 days
+		});
 
-	    return token;
+		return token;
 	};
 
 	// Get Secret & Generate Token
@@ -114,24 +146,11 @@ function run(socket, controller)
 	socket.on('connect', function() {
 		console.log('Socket IO [Connected]: ' + socket_address + ':' + socket_port);
 
-
-		// List Serial Ports
-	    socket.emit('list');
-	    socket.on ('serialport:list', function (data) {
-		    console.log('-------------------------');
-		    console.log('Listed Serial Ports: ');
-
-			// List Ports
-			for (var i = 0; i < data.length; i++) {
-				console.log(i + "] Seral Port List: " + data[i].port);
-			}
-
-			console.log('-------------------------');
-		});
-
 		// Open port
-		socket.emit('open', controller_serial_port, { baudrate: Number(controller_serial_baud) });
-		console.log('Opened Serial Port: ' + controller_serial_port + ':' + controller_serial_baud);
+		socket.emit('open', controller_serial_port, {
+			baudrate: Number(controller_serial_baud),
+			controllerType: controller_type
+		});
 
 		// Close port
 		//socket.send('close', controller_serial_port);
@@ -144,6 +163,15 @@ function run(socket, controller)
 		//socket.emit('command', controller_serial_port, 'homing');
 		//socket.send('command', controller_serial_port, 'cyclestart');
 		//socket.send('command', controller_serial_port, 'reset');
+	});
+
+	socket.on('serialport:open', function (options) {
+		const { controllerType, port, baudrate, inuse } = options;
+		console.log('Opened Serial Port: ' + options.port + ':' + options.baudrate);
+	});
+
+	socket.on('Grbl:state', function(state) {
+		console.log('[Grbl]', state.status.raw);
 	});
 
 	// Detect Disconnect
@@ -162,7 +190,6 @@ function run(socket, controller)
 		 socket.destroy();
 		 console.log('Socket IO ERROR, token is likly invalid');
 	});
-
 
 	// =====================================================
 	// Play Station 3 Controller / Game Pad
@@ -468,14 +495,14 @@ function run(socket, controller)
 
 		// Set Spped
 		switch(speed) {
-		    case 1:
-		        speed = 0.05;
-		        break;
-		    case 3:
-		        speed = 5;
-		        break;
-		    default:
-		        speed = 0.5;
+			case 1:
+				speed = 0.05;
+				break;
+			case 3:
+				speed = 5;
+				break;
+			default:
+				speed = 0.5;
 		}
 
 		// Send gCode
