@@ -102,7 +102,7 @@ node-pre-gyp rebuild                               # rebuilds the C code
 node-pre-gyp install --fallback-to-build
 
 # Install Node-dualshock-controller
-sudo npm install -g dualshock-controller--unsafe-perm
+sudo npm install -g dualshock-controller --unsafe-perm
 -- OR --
 # Compile HID
 cd ~/
