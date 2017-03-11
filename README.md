@@ -34,17 +34,43 @@ gcc -o sixpair sixpair.c -lusb
 ### Connect PS3 over USB
 # Get PS3 DS 
 sudo ./sixpair
+```
 
-# 
-### Disonnect PS3 over USB
-bluetoothctl
-### Connect PS3 over USB
-devices
+### [Parting DualShock 3 Controller](https://wiki.gentoo.org/wiki/Sony_DualShock)
+```
+### Disonnect DualShock 3 over USB
+
+# Start bluetoothctl:
+user $bluetoothctl
+
+# Enable the agent and set it as default:
 agent on
-trust MAC # Replace "MAC" with MAC of "Device 64:D4:BD:B3:9E:66 PLAYSTATION(R)3 Controller"
+default-agent
+
+Power on the Bluetooth controller, and set it as discoverable and pairable:
+power on
+discoverable on
+pairable on
+
+### Connect DualShock 3 over USB, and press the PlayStation button.
+
+# Discover the DualShock 3 MAC address:
+devices
+
+### Disonnect DualShock 3 over USB
+
+#Allow the service authorization request:
+#[agent]Authorize service service_uuid (yes/no): yes
+
+#Trust the DualShock 3:
+#trust device_mac_address # Replace "MAC" with MAC of "Device 64:D4:BD:B3:9E:66 PLAYSTATION(R)3 Controller"
 trust 64:D4:BD:B3:9E:66 
+
+# The DualShock 3 is now paired:
 quit
-### Disonnect PS3 over USB, you should now be able to connect wirelessly. To check this, first list everything in /dev/input:
+
+# Turn the DualShock 3 off when it's no longer in use by pressing and holding the PlayStation button for 10 seconds.
+# Press the PlayStation button to use the DualShock 3 again.
 ```
 
 ### Test Controller Connectivity
