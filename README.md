@@ -75,9 +75,6 @@ quit
 
 ### Test Controller Connectivity
 ```
-# List Devices
-ls /dev/input
-
 ### PS3 Controller: press the PS button, the lights on the front of the controller should flash for a couple of seconds then stop, leaving a single light on. If you now look again at the contents of /dev/input you should see a new device, probably called something like ‘js0’:
 
 # List Devices
@@ -142,6 +139,18 @@ sudo udevadm control --reload-rules
 exit
 ```
 
+# QUICK FIX for node-hid hidraw... PLEASE HELP IF YOU KNOW FIX
+```
+# I am having issues with node-hid --driver=hidraw not seeming to work... quickest fix is to reinstall, node-hid --driver=hidraw 
+
+# Reinstall (node-hid --driver=hidraw) on cncjs-pendant-ps3
+cd /usr/lib/node_modules/cncjs-pendant-ps3/
+sudo npm install node-hid --driver=hidraw --build-from-source --unsafe-perm
+```
+
+I recommend rebooting now.
+After reboot you can test pendant by running `cncjs-pendant-ps3 -p "/dev/ttyUSB0"`.
+
 ----------------------------------------
 
 # Auto Start
@@ -157,7 +166,7 @@ pm2 startup debian
   sudo su -c "env PATH=$PATH:/home/pi/.nvm/versions/node/v4.5.0/bin pm2 startup debian -u pi --hp /home/pi"
 
 # Start CNC.js (on port 8000) with PM2
-pm2 start cncjs-pendant-ps3
+pm2 start cncjs-pendant-ps3 -p "/dev/ttyUSB0"
 
 # Set current running apps to startup
 pm2 save

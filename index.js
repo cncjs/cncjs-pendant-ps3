@@ -2,7 +2,7 @@
 
 // Node.js Playstation 3 / DS3 Controller for CNC.js
 // by Austin St. Aubin <austinsaintaubin@gmail.com>
-// v1.0.4 BETA [2017/03/11]
+// v1.0.5 BETA [2017/03/11]
 // https://github.com/cheton/cnc/issues/103
 // [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 // USAGE: ./cncjs-pendant-ps3 -p "/dev/ttyUSB0"
@@ -184,6 +184,9 @@ module.exports = function(options, callback) {
 		// ------------------------------------------
 
 		// Safety Switches & Modifyers
+		ps3_led = 0b10000;
+		ps3_rumble_left = 0;
+		ps3_rumble_right = 0;
 
 		// psx
 		var psx = false;
@@ -625,25 +628,49 @@ module.exports = function(options, callback) {
 			stick_right = false;
 
 		// Safty = Stick Button
-		controller.on('leftAnalogBump:release', function(data) {
+		controller.on('leftAnalogBump:press', function(data) {
 			// Toggle Enable
-			if (stick_left) {
+			if (stick_left  || stick_right) {
 				stick_left = false;
+				stick_right = false;
+				ps3_rumble_left = 0; // 0-1 (Rumble left on/off)
 			} else {
 				stick_left = true;
+				stick_right = true;
+				ps3_rumble_left = 1; // 0-1 (Rumble left on/off)
 			}
 
-			console.log(data + '|' + stick_left);
+			//console.log('L] rightAnalogBump: ' + stick_right + " leftAnalogBump: "+ stick_left);
+
+			/*
+			// Runble Controler Beefly
+			ps3_rumble_left = 1; // 0-1 (Rumble left on/off)
+			setTimeout(function () {
+			    ps3_rumble_left = 0; // 0-1 (Rumble left on/off)
+			}, 510);
+			*/
 		});
-		controller.on('rightAnalogBump:release', function(data) {
+		controller.on('rightAnalogBump:press', function(data) {
 			// Toggle Enable
-			if (stick_right) {
+			if (stick_right || stick_left) {
 				stick_right = false;
+				stick_left = false;
+				ps3_rumble_left = 0; // 0-1 (Rumble left on/off)
 			} else {
 				stick_right = true;
+				stick_left = true;
+				ps3_rumble_left = 1; // 0-1 (Rumble left on/off)
 			}
 
-			console.log(data + '|' + stick_right);
+			//console.log('R] rightAnalogBump: ' + stick_right + " leftAnalogBump: "+ stick_left);
+
+			/*
+			// Runble Controler Beefly
+			ps3_rumble_left = 1; // 0-1 (Rumble left on/off)
+			setTimeout(function () {
+			    ps3_rumble_left = 0; // 0-1 (Rumble left on/off)
+			}, 510);
+			*/
 		});
 
 		// - - - - - - - - - - - - - - - - - - - -
@@ -675,15 +702,14 @@ module.exports = function(options, callback) {
 			//console.log('stick-right: ' + Number(data.x - 128) + ' [' + right_x + '] | ' +  Number(data.y - 128) + ' [' + right_y + '] | ' + stick_right)
 		});
 
-
-		// Move Gantry bassed on Sticks at a regualr interval
-		setInterval(stickMovment, 100);
-
 		// [Function] map(value, fromLow, fromHigh, toLow, toHigh)   https://www.arduino.cc/en/Reference/Map
 		function map(x, in_min, in_max, out_min, out_max)
 		{
 		  return Number((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
 		}
+
+		// Move Gantry bassed on Sticks at a regualr interval
+		setInterval(stickMovment, 100);
 
 		// Move X & Y base on X & Y Stick Movments
 		function stickMovment() {
@@ -693,10 +719,10 @@ module.exports = function(options, callback) {
 			if (left_x >= stick_sensitivity | left_x <= -stick_sensitivity || left_y >= stick_sensitivity || left_y <= -stick_sensitivity || right_x >= stick_sensitivity || right_x <= -stick_sensitivity || right_y >= stick_sensitivity || right_y <= -stick_sensitivity) {
 				// Additional Safty Catch
 				if (!stick_left) {
-						left_x = 0; left_y = 0;
+					left_x = 0; left_y = 0;
 				}
 				if (!stick_right) {
-						right_x = 0; right_y = 0;
+					right_x = 0; right_y = 0;
 				}
 
 				//!!!!!!!!!!!!!!!!! need to detect if it's in inches or millimetersmm to avoid and overrun in the multiplier this can be done with agreeable status I believe.
@@ -708,7 +734,6 @@ module.exports = function(options, callback) {
 				//console.log('setInterval: x' + sum_x + ' y' + sum_y + ' | ' + 'G91 G0 X' + map(sum_x, 0, 128, 0.0001, 2).toFixed(4) + ' Y' + map(sum_y, 0, 128, 0.0001, 2).toFixed(4));
 			}
 		}
-
 
 		// ------------------------------------------
 
@@ -734,6 +759,20 @@ module.exports = function(options, callback) {
 			 //...doStuff();
 		});
 */
+		// ------------------------------------------
+
+		// Send Extras Updates
+		setInterval(updateControllerExtras, 500);
+		function updateControllerExtras() {
+			controller.setExtras({
+				rumbleLeft:  ps3_rumble_left,   // 0-1 (Rumble left on/off)
+				rumbleRight: ps3_rumble_right,   // 0-255 (Rumble right intensity)
+				led: ps3_led // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
+			});
+
+			console.log("ps3_rumble_left: " + ps3_rumble_left);
+			console.log("ps3_rumble_right: " + ps3_rumble_right);
+		}
 
 		//controller status
 		//as of version 0.6.2 you can get the battery %, if the controller is connected and if the controller is charging
@@ -745,19 +784,19 @@ module.exports = function(options, callback) {
 			switch(value) {
 			case '100%':
 			case "90%":
-				controller.setExtras({led: 0b11110});  // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
+				ps3_led = 30;  // 0b11110 // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
 		        break;
 			case "80%":
 			case "70%":
-				lcontroller.setExtras({led: 0b11100});  // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
+				ps3_led = 28;  // 0b11100 // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
 		        break;
 			case "50%":
 			case "40%":
 			case "30%":
-				controller.setExtras({led: 0b11000});  // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
+				ps3_led = 24;  // 0b11000 // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
 		        break;
 		    default:
-		        controller.setExtras({led: 0b11110});  // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
+		        ps3_led = 16;  // 0b10000 // 2 | 4 | 8 | 16 (Leds 1-4 on/off, bitmasked)
 		        break;
 		}
 
@@ -768,6 +807,7 @@ module.exports = function(options, callback) {
 		controller.on('charging:change', function (value) {
 			console.log('connection:change:' + value);
 		});
+
 /*
 		//DualShock 3 control rumble and light settings for the controller
 		controller.setExtras({

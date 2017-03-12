@@ -1,7 +1,7 @@
 {
   "name": "cncjs-pendant-ps3",
-  "version": "1.0.4",
-  "description": "A bare minimum example to develop a cncjs pendant.",
+  "version": "1.0.5",
+  "description": "A cncjs pendant, using Playstation 3 Dualshock Controller / SIXAXIS Controller.",
   "license": "MIT",
   "main": "./index.js",
   "engines": {
@@ -36,10 +36,10 @@
     "serialport": "^4.0.7",
     "socket.io-client": "^1.7.2",
     "vorpal": "^1.11.4",
-    "node-hid": "^0.5.4 --driver=hidraw --build-from-source",
+    "dualshock-controller": "^1.1.1",
     "node-gyp": "^3.5.0",
     "node-pre-gyp": "^0.6.33",
-    "dualshock-controller": "^1.1.1"
+    "node-hid": "^0.5.4 --driver=hidraw --build-from-source"
   },
   "devDependencies": {}
 }
