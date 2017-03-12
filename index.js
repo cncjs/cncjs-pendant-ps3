@@ -2,7 +2,7 @@
 
 // Node.js Playstation 3 / DS3 Controller for CNC.js
 // by Austin St. Aubin <austinsaintaubin@gmail.com>
-// v1.0.1 BETA [2017/03/11]
+// v1.0.4 BETA [2017/03/11]
 // https://github.com/cheton/cnc/issues/103
 // [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 // USAGE: ./cncjs-pendant-ps3 -p "/dev/ttyUSB0"
@@ -13,8 +13,8 @@ const path = require('path');
 const io = require('socket.io-client');  // Socket.io connection to CNC
 const jwt = require('jsonwebtoken');
 const get = require('lodash.get');
-const dualShock = require('dualshock-controller'); // https://www.npmjs.com/package/dualshock-controller
 const HID = require('node-hid');
+const dualShock = require('dualshock-controller'); // https://www.npmjs.com/package/dualshock-controller
 
 // View HID Devices
 //var HID = require('node-hid');

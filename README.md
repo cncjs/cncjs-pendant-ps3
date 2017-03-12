@@ -108,13 +108,13 @@ jstest /dev/input/js0
 # Install Tools
 sudo apt-get install -y libudev-dev libusb-1.0-0 libusb-1.0-0-dev build-essential git
 sudo apt-get install -y gcc-4.8 g++-4.8 && export CXX=g++-4.8
-sudo npm install -g node-gyp node-pre-gyp
+#npm install node-gyp node-pre-gyp
 
 # Install node-hid with hidraw support
-sudo npm install -g node-hid --driver=hidraw --build-from-source --unsafe-perm
+#npm install node-hid --driver=hidraw --build-from-source --unsafe-perm
 
 # Install Pendant Package
-sudo npm install cncjs-pendant-ps3 --unsafe-perm -g  # Install Globally
+sudo npm install -g cncjs-pendant-ps3 --unsafe-perm  # Install Globally
 
 ## If NOT installed globally, Install node-hid with hidraw support (https://github.com/rdepena/node-dualshock-controller)
 ```

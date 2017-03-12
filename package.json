@@ -1,41 +1,45 @@
 {
-	"name": "cncjs-pendant-ps3",
-	"version": "1.0.1",
-	"description": "A bare minimum example to develop a cncjs pendant.",
-	"main": "./index.js",
-	"engines": {
-		"node": ">=4"
-	},
-	"bin": {
-		"cncjs-pendant-ps3": "./bin/cncjs-pendant-ps3"
-	},
-	"preferGlobal": true,
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/cncjs/cncjs-pendant-ps3.git"
-	},
-	"keywords": [
-		"cncjs",
-		"pendant",
-		"ps3"
-	],
-	"author": "Austin St. Aubin <AustinSaintAubin@gmail.com>",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/cncjs/cncjs-pendant-ps3/issues"
-	},
-	"homepage": "https://github.com/cncjs/cncjs-pendant-ps3#readme",
-	"dependencies": {
-		"commander": "^2.9.0",
-		"inquirer": "^3.0.1",
-		"jsonwebtoken": "^7.2.1",
-		"lodash.get": "^4.4.2",
-		"serialport": "^4.0.7",
-		"socket.io-client": "^1.7.2",
-		"vorpal": "^1.11.4",
-		"dualshock-controller": "^1.1.1"
-	}
+  "name": "cncjs-pendant-ps3",
+  "version": "1.0.4",
+  "description": "A bare minimum example to develop a cncjs pendant.",
+  "license": "MIT",
+  "main": "./index.js",
+  "engines": {
+    "node": ">=4"
+  },
+  "bin": {
+    "cncjs-pendant-ps3": "./bin/cncjs-pendant-ps3"
+  },
+  "preferGlobal": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cncjs/cncjs-pendant-ps3.git"
+  },
+  "keywords": [
+    "cncjs",
+    "pendant",
+    "ps3"
+  ],
+  "author": "Austin St. Aubin <AustinSaintAubin@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/cncjs/cncjs-pendant-ps3/issues"
+  },
+  "homepage": "https://github.com/cncjs/cncjs-pendant-ps3#readme",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "inquirer": "^3.0.1",
+    "jsonwebtoken": "^7.2.1",
+    "lodash.get": "^4.4.2",
+    "serialport": "^4.0.7",
+    "socket.io-client": "^1.7.2",
+    "vorpal": "^1.11.4",
+    "node-hid": "^0.5.4 --driver=hidraw --build-from-source",
+    "node-gyp": "^3.5.0",
+    "node-pre-gyp": "^0.6.33",
+    "dualshock-controller": "^1.1.1"
+  },
+  "devDependencies": {}
 }
