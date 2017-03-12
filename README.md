@@ -166,7 +166,7 @@ pm2 startup debian
   sudo su -c "env PATH=$PATH:/home/pi/.nvm/versions/node/v4.5.0/bin pm2 startup debian -u pi --hp /home/pi"
 
 # Start CNC.js (on port 8000) with PM2
-pm2 start cncjs-pendant-ps3 -p "/dev/ttyUSB0"
+pm2 start $(which cncjs-pendant-ps3) -- -p "/dev/ttyUSB0"
 
 # Set current running apps to startup
 pm2 save
