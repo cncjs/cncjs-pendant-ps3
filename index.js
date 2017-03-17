@@ -2,7 +2,7 @@
 
 // Node.js Playstation 3 / DS3 Controller for CNC.js
 // by Austin St. Aubin <austinsaintaubin@gmail.com>
-// v1.0.7 BETA [2017/03/11]
+// v1.0.8 BETA [2017/03/16]
 // https://github.com/cheton/cnc/issues/103
 // [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 // USAGE: ./cncjs-pendant-ps3 -p "/dev/ttyUSB0"
@@ -510,7 +510,7 @@ module.exports = function(options, callback) {
 			}
 
 			// Set Movemnt Varables
-			if (axis == "X" && ( dpad_x_axis < 10 && dpad_x_axis > -10 )) {
+			if (axis == "X" && ( dpad_x_axis < 14 && dpad_x_axis > -14 )) {
 				// X Axis
 
 				// Set Direction
@@ -521,7 +521,7 @@ module.exports = function(options, callback) {
 					// Negitave Movment
 					dpad_x_axis += speed * -1;
 				}
-			} else if (axis == "Y" && ( dpad_y_axis < 10 && dpad_y_axis > -10 )) {
+			} else if (axis == "Y" && ( dpad_y_axis < 14 && dpad_y_axis > -14 )) {
 				// Y Axis
 
 				// Set Direction
@@ -709,7 +709,7 @@ module.exports = function(options, callback) {
 		}
 
 		// Move Gantry bassed on Sticks at a regualr interval
-		setInterval(stickMovment, 100);
+		setInterval(stickMovment, 50);
 
 		// Move X & Y base on X & Y Stick Movments
 		function stickMovment() {
