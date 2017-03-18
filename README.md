@@ -174,3 +174,44 @@ pm2 save
 # Get list of PM2 processes
 pm2 list
 ```
+
+----------------------------------------
+
+# FFMpeg
+http://www.jeffreythompson.org/blog/2014/11/13/installing-ffmpeg-for-raspberry-pi/
+```
+# Run as Sudo
+sudo -i
+
+# INSTALL H264 SUPPORT
+cd /usr/src
+git clone git://git.videolan.org/x264
+cd x264
+./configure --host=arm-unknown-linux-gnueabi --enable-static --disable-opencl
+make
+sudo make install
+
+# INSTALL FFMPEG (This may take a REALLY long time, so be patient.)
+cd /usr/src
+git clone https://github.com/FFmpeg/FFmpeg.git
+cd ffmpeg
+sudo ./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
+make
+sudo make install
+```
+
+# Recored Stream w/ ffmpeg
+```
+# [Varables]
+source_stram="http://xcarve:8080/?action=stream"
+destination_directory="/home/pi/Videos"
+destination_file="xcarve-recording_$(date +'%Y%m%d_%H%M%S').mpeg"
+
+# Recored Stream w/ ffmpeg
+ffmpeg -i "${source_stram}" "${destination_directory}/${destination_file}"
+```
+
+# Save RAW Stream (not playable by most players)
+```
+wget -O stream-capture.mjpg http://xcarve:8080/?action=stream
+```
