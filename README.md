@@ -210,8 +210,3 @@ destination_file="xcarve-recording_$(date +'%Y%m%d_%H%M%S').mpeg"
 # Recored Stream w/ ffmpeg
 ffmpeg -i "${source_stram}" "${destination_directory}/${destination_file}"
 ```
-
-# Save RAW Stream (not playable by most players)
-```
-wget -O stream-capture.mjpg http://xcarve:8080/?action=stream
-```
