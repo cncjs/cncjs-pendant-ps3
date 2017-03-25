@@ -165,7 +165,7 @@ pm2 startup debian
   #[PM2] You have to run this command as root. Execute the following command:
   sudo su -c "env PATH=$PATH:/home/pi/.nvm/versions/node/v4.5.0/bin pm2 startup debian -u pi --hp /home/pi"
 
-# Start CNC.js (on port 8000) with PM2
+# Start Dual Shock / PS3 Bluetooth Remote Pendant for CNCjs (conected to serail device @ /dev/ttyUSB0) with PM2
 pm2 start $(which cncjs-pendant-ps3) -- -p "/dev/ttyUSB0"
 
 # Set current running apps to startup
