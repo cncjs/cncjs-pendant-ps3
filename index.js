@@ -2,7 +2,7 @@
 
 // Node.js Playstation 3 / DS3 Controller for CNC.js
 // by Austin St. Aubin <austinsaintaubin@gmail.com>
-// v1.0.8 BETA [2017/03/16]
+// v1.0.9 BETA [2017/03/27]
 // https://github.com/cheton/cnc/issues/103
 // [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 // USAGE: ./cncjs-pendant-ps3 -p "/dev/ttyUSB0"
@@ -315,12 +315,19 @@ module.exports = function(options, callback) {
 		// R1
 
 		// Raise Z
+		controller.on('triangle:press', function(data) {
+			if (r1) {
+				move_z_axis += 0.25;
+			}
+		});
 		controller.on('triangle:hold', function(data) {
 			if (r1) {
-				socket.emit('command', options.port, 'gcode', 'G91 G0 Z0.25'); // Switch to relative coordinates, Move one unit right in X and one unit right in Y
-				socket.emit('command', options.port, 'gcode', 'G90');  // Switch back to absolute coordinates
-
-				//console.log('Raising Z:' + data);
+				move_z_axis += 0.25;
+			}
+		});
+		controller.on('triangle:release', function(data) {
+			if (r1) {
+				move_z_axis = 0;
 			}
 		});
 
@@ -340,22 +347,36 @@ module.exports = function(options, callback) {
 		});
 
 		// Lower Z (Slow)
+		controller.on('circle:press', function(data) {
+			if (r1) {
+				move_z_axis -= 0.05;
+			}
+		});
 		controller.on('circle:hold', function(data) {
 			if (r1) {
-				socket.emit('command', options.port, 'gcode', 'G91 G0 Z-0.05'); // Switch to relative coordinates, Move one unit right in X and one unit right in Y
-				socket.emit('command', options.port, 'gcode', 'G90');  // Switch back to absolute coordinates
-
-				//console.log('Lowering Z:' + data);
+				move_z_axis -= 0.05;
+			}
+		});
+		controller.on('circle:release', function(data) {
+			if (r1) {
+				move_z_axis = 0;
 			}
 		});
 
 		// Lower Z
+		controller.on('x:press', function(data) {
+			if (r1) {
+				move_z_axis -= 0.25;
+			}
+		});
 		controller.on('x:hold', function(data) {
 			if (r1) {
-				socket.emit('command', options.port, 'gcode', 'G91 G0 Z-0.25'); // Switch to relative coordinates, Move one unit right in X and one unit right in Y
-				socket.emit('command', options.port, 'gcode', 'G90');  // Switch back to absolute coordinates
-
-				//console.log('Lowering Z:' + data);
+				move_z_axis -= 0.25;
+			}
+		});
+		controller.on('x:release', function(data) {
+			if (r1) {
+				move_z_axis = 0;
 			}
 		});
 
@@ -475,10 +496,11 @@ module.exports = function(options, callback) {
 		// ------------------------------------------
 
 		// ==[ D Pad ]==
-		var dpad_x_axis = 0;
-		var dpad_y_axis = 0;
+		var move_x_axis = 0;
+		var move_y_axis = 0;
+		var move_z_axis = 0;
 
-		// Set Movement of Gantry Based on DPad
+		// Set Movement of Gantry Based on DPad, and Z-Imput from other buttons
 		function dpad(axis, direction, name) {
 			if (l2) {
 				// Fast
@@ -510,49 +532,50 @@ module.exports = function(options, callback) {
 			}
 
 			// Set Movemnt Varables
-			if (axis == "X" && ( dpad_x_axis < 14 && dpad_x_axis > -14 )) {
+			if (axis == "X" && ( move_x_axis < 14 && move_x_axis > -14 )) {
 				// X Axis
 
 				// Set Direction
 				if (direction) {
 					// Positve Movment
-					dpad_x_axis += speed;
+					move_x_axis += speed;
 				} else {
 					// Negitave Movment
-					dpad_x_axis += speed * -1;
+					move_x_axis += speed * -1;
 				}
-			} else if (axis == "Y" && ( dpad_y_axis < 14 && dpad_y_axis > -14 )) {
+			} else if (axis == "Y" && ( move_y_axis < 14 && move_y_axis > -14 )) {
 				// Y Axis
 
 				// Set Direction
 				if (direction) {
 					// Positve Movment
-					dpad_y_axis += speed;
+					move_y_axis += speed;
 				} else {
 					// Negitave Movment
-					dpad_y_axis += speed * -1;
+					move_y_axis += speed * -1;
 				}
 			}
 
-			//console.log("DPad Set Movemnet: " + dpad_x_axis + ': ' + dpad_y_axis + "   | " + speed)
+			//console.log("DPad Set Movemnet: " + move_x_axis + ': ' + move_y_axis + "   | " + speed)
 		}
 
 		// Move Gantry X | Y
 		setInterval(dpadMoveAxis, 100);
 		function dpadMoveAxis() {
 			// Check if Axis Needs Moving
-			if (dpad_x_axis != 0 || dpad_y_axis != 0)
+			if (move_x_axis != 0 || move_y_axis != 0 || move_z_axis != 0)
 			{
 				// Send gCode
-				socket.emit('command', options.port, 'gcode', 'G91 G0 X' + dpad_x_axis +  " Y" + dpad_y_axis);
+				socket.emit('command', options.port, 'gcode', 'G91 G0 X' + move_x_axis + " Y" + move_y_axis + " Z" + move_z_axis);
 				socket.emit('command', options.port, 'gcode', 'G90');  // Switch back to absolute coordinates
 
 				// Debuging
-				//console.log("DPad MOVE: " + dpad_y_axis + ': ' + dpad_y_axis);
+				//console.log("DPad MOVE: " + move_y_axis + ': ' + move_y_axis + ': ' + move_z_axis);
 
 				// Reset Axis Varables
-				dpad_x_axis -= dpad_x_axis;
-				dpad_y_axis -= dpad_y_axis;
+				move_x_axis -= move_x_axis;
+				move_y_axis -= move_y_axis;
+				move_z_axis -= move_z_axis;
 			}
 		}
 
@@ -565,6 +588,9 @@ module.exports = function(options, callback) {
 		controller.on('dpadUp:hold', function(data) {
 			dpad('Y', true, data)
 		});
+    controller.on('dpadUp:release', function(data) {
+			move_y_axis = 0;
+		});
 
 		// Y Down
 		controller.on('dpadDown:press', function(data) {
@@ -572,6 +598,9 @@ module.exports = function(options, callback) {
 		});
 		controller.on('dpadDown:hold', function(data) {
 			dpad('Y', false, data)
+		});
+    controller.on('dpadDown:release', function(data) {
+			move_y_axis = 0;
 		});
 
 		// X Right
@@ -581,6 +610,9 @@ module.exports = function(options, callback) {
 		controller.on('dpadRight:hold', function(data) {
 			dpad('X', true, data)
 		});
+    controller.on('dpadRight:release', function(data) {
+			move_x_axis = 0;
+		});
 
 		// X Left
 		controller.on('dpadLeft:press', function(data) {
@@ -589,6 +621,9 @@ module.exports = function(options, callback) {
 		controller.on('dpadLeft:hold', function(data) {
 			dpad('X', false, data)
 		});
+    controller.on('dpadLeft:release', function(data) {
+      move_x_axis = 0;
+    });
 
 		// ------------------------------------------
 
