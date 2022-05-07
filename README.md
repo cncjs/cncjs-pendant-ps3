@@ -1,6 +1,12 @@
 # cncjs-pendant-ps3
 Dual Shock / PS3 Bluetooth Remote Pendant for CNCjs
 
+----
+
+NOTE: A more up-to-date implimentation can be found at [balthisar/cncjs-pendant-gamepad](https://github.com/balthisar/cncjs-pendant-gamepad).
+
+----
+
 Use [Playstation 3 Controller](https://www.playstation.com/en-us/explore/accessories/dualshock-3-ps3/) wirelessly over bluetooth to control CNC from the host device (raspberry pi). [PS3 CNC Control Button Map](https://docs.google.com/drawings/d/1DMzfBk5DSvjJ082FrerrfmpL19-pYAOcvcmTbZJJsvs/edit?usp=sharing)
 
 [Remote Pendant (Playstation 3 Dualshock Controller / SIXAXIS Controller)](https://github.com/cheton/cnc/issues/103)
